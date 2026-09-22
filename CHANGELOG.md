@@ -2,6 +2,24 @@
 
 All notable changes to this project are documented here.
 
+## [Android 1.0.0] — 2026-09-23 (render engine `tlx-2.0.0`)
+
+### Added
+- **TimelinerX for Android** (`android-app/`): import (Android, iPhone, Takeout ZIP, "Open with" and
+  the share sheet), Journey / Camera / Look / Titles / Video studio with a live preview, rendering to
+  H.264 MP4 with the phone's hardware encoder, optional soundtrack, gallery saving, video library,
+  `.nrproj` export/import, 10 languages (RTL Arabic).
+- **Offline World** basemap for Android: Natural Earth coastlines, lakes, borders and 7,342 city names
+  in 10 languages, graded by the theme like any other map. No network and no API key.
+- Parity tests: the JavaScript engine reproduces the Python engine on all fixtures (imports, journeys
+  and camera plans within 1e-6), and the 11 theme graders pixel for pixel.
+- GitHub Actions workflow *Android APK*: tests, builds, signs (with repository secrets) and attaches
+  the APK to tagged releases.
+
+### Improved
+- The Android importer salvages every complete record from truncated or trailing-comma exports that the
+  desktop importer sends to the repair flow.
+
 ## [1.0.0] — 2026-09-22 (render engine `tlx-2.0.0`)
 
 The app is now **TimelinerX** (previously NuRichter Timeliner). Project files keep the `.nrproj`

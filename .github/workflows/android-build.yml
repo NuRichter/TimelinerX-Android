@@ -1,0 +1,103 @@
+name: Android APK
+
+on:
+  push:
+    branches: [main, master]
+    paths: ['android-app/**', 'fixtures/**', '.github/workflows/android-build.yml']
+    tags: ['v*', 'android-v*']
+  pull_request:
+    paths: ['android-app/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    name: Test, build and package the APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: android-app
+    env:
+      TLX_VERSION_CODE: ${{ github.run_number }}
+      # Optional secrets. Without the keystore secrets CI publishes a debug APK (installable, but each
+      # CI run signs with a different debug key, so updates need an uninstall first).
+      KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      TLX_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      TLX_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      TLX_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      # Embeds a CARTO key in the APK (extractable by anyone who has the APK). Leave unset for public builds.
+      VITE_CARTO_KEY: ${{ secrets.TIMELINERX_CARTO_KEY_EMBED }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: android-app/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install
+        run: npm ci
+
+      - name: Engine tests (parity with the desktop engine, importer, i18n)
+        run: npm test
+
+      - name: Build the web app
+        run: npm run build
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Version name
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then v="${GITHUB_REF_NAME#android-}"; v="${v#v}"; else v="1.0.0"; fi
+          echo "TLX_VERSION_NAME=${v}" >> "$GITHUB_ENV"
+
+      - name: Signing key
+        if: env.KEYSTORE_B64 != ''
+        shell: bash
+        run: |
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          echo "TLX_KEYSTORE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+
+      - name: Gradle build
+        working-directory: android-app/android
+        shell: bash
+        run: |
+          chmod +x gradlew
+          if [[ -n "${TLX_KEYSTORE:-}" ]]; then ./gradlew --no-daemon assembleRelease; else ./gradlew --no-daemon assembleDebug; fi
+
+      - name: Collect APK
+        shell: bash
+        run: |
+          mkdir -p ../out
+          if [[ -n "${TLX_KEYSTORE:-}" ]]; then
+            cp android/app/build/outputs/apk/release/app-release.apk "../out/TimelinerX-${TLX_VERSION_NAME}.apk"
+          else
+            cp android/app/build/outputs/apk/debug/app-debug.apk "../out/TimelinerX-${TLX_VERSION_NAME}-debug.apk"
+          fi
+          cd ../out && sha256sum *.apk > SHA256SUMS.txt && cat SHA256SUMS.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TimelinerX-android
+          path: out/*
+          if-no-files-found: error
+
+      - name: Publish release (tags only)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: out/*
+          generate_release_notes: true

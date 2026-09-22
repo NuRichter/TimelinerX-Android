@@ -1,0 +1,29 @@
+{
+  "name": "timelinerx-android",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TimelinerX for Android: turn your Google Timeline into a cinematic map video, on your phone.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "node --test test/*.test.js",
+    "sync": "vite build && npx cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.3",
+    "@preact/signals": "^2.11.2",
+    "fflate": "^0.8.3",
+    "htm": "^3.1.1",
+    "mp4-muxer": "^5.2.2",
+    "preact": "^10.29.8"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.2",
+    "vite": "^8.3.0"
+  }
+}

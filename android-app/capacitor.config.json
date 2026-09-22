@@ -1,0 +1,29 @@
+{
+  "appId": "com.nurichter.timelinerx",
+  "appName": "TimelinerX",
+  "webDir": "dist",
+  "backgroundColor": "#0b1020",
+  "android": {
+    "backgroundColor": "#0b1020",
+    "allowMixedContent": false,
+    "captureInput": false,
+    "webContentsDebuggingEnabled": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1200,
+      "launchAutoHide": false,
+      "backgroundColor": "#0b1020",
+      "showSpinner": false,
+      "androidScaleType": "CENTER_CROP"
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0b1020",
+      "overlaysWebView": false
+    },
+    "CapacitorHttp": {
+      "enabled": false
+    }
+  }
+}

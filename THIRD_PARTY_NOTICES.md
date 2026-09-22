@@ -98,3 +98,26 @@ provider. However, requesting tiles (zoom/x/y) necessarily tells the tile
 server which map areas the video shows, i.e. roughly where the route goes. If
 that matters to you, use the Plain provider or an MBTiles file (no network
 requests), or offline mode with a cache you filled earlier.
+
+## (e) Android app (`android-app/`)
+
+The Android app is new TimelinerX code under the MIT License. Its engine (`android-app/src/engine/`) is a
+JavaScript port of the components listed in (a) and (b) and carries the same upstream attribution to
+Google Timeline Visualizer (c) 2025 mahlernim (MIT).
+
+| Component | Licence | Use |
+|---|---|---|
+| Capacitor (`@capacitor/core`, `android`, `app`, `splash-screen`, `status-bar`, `cli`) | MIT | Android shell and native bridge |
+| AndroidX libraries pulled in by Capacitor | Apache-2.0 | Android support libraries |
+| Preact, `@preact/signals`, htm | MIT | User interface |
+| fflate | MIT | Streaming Takeout ZIP intake |
+| mp4-muxer | MIT | MP4 container (fast start) |
+| Vite (build only) | MIT | Bundler |
+| Outfit, Instrument Sans | SIL OFL 1.1 | Same fonts as the desktop app (`android-app/public/fonts/`) |
+
+**Offline World map** (`android-app/public/world/`): derived from Natural Earth 1:10m / 1:50m / 1:110m
+land, lakes, admin-0 boundary lines and 1:10m populated places (https://www.naturalearthdata.com/),
+which are in the public domain. "Natural Earth" is shown as attribution when this map is used.
+
+H.264 encoding uses the phone's own media codecs through the Android WebView (WebCodecs); no codec is
+shipped in the app.
