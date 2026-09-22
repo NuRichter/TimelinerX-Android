@@ -9,9 +9,10 @@ from timelinerx.journeys.journey import build_journey, JourneyConfig
 from timelinerx.camera.planner import plan_frames, CameraConfig, recommend_duration
 import numpy as np
 out = {}
-fx = sorted(glob.glob(os.path.join(ROOT, 'fixtures', '*.json')) + glob.glob(os.path.join(ROOT, 'fixtures', 'upstream', '*sample*.json')))
+FIXDIR = os.path.join(os.path.dirname(__file__), '..', 'test', 'fixtures')
+fx = sorted(glob.glob(os.path.join(FIXDIR, '*.json')) + glob.glob(os.path.join(FIXDIR, 'upstream', '*sample*.json')))
 for f in fx:
-    name = os.path.relpath(f, os.path.join(ROOT, 'fixtures')).replace(os.sep, '/')
+    name = os.path.relpath(f, FIXDIR).replace(os.sep, '/')
     rec = {}
     try:
         tl = load_timeline(f, compute_sha=False)

@@ -6,7 +6,7 @@ import { zipSync, strToU8 } from 'fflate';
 import { importTimeline, ImportError } from '../src/engine/importer.js';
 import { demoTimeline } from '../src/engine/demo.js';
 
-const FIX = new URL('../../fixtures/', import.meta.url).pathname;
+const FIX = new URL('./fixtures/', import.meta.url).pathname;
 const read = (n) => new Uint8Array(readFileSync(FIX + n));
 
 function tinyChunks(bytes, size) {

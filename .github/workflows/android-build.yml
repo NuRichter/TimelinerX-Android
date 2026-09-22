@@ -3,7 +3,7 @@ name: Android APK
 on:
   push:
     branches: [main, master]
-    paths: ['android-app/**', 'fixtures/**', '.github/workflows/android-build.yml']
+    paths: ['android-app/**', '.github/workflows/android-build.yml']
     tags: ['v*', 'android-v*']
   pull_request:
     paths: ['android-app/**']
@@ -31,20 +31,31 @@ jobs:
       # Embeds a CARTO key in the APK (extractable by anyone who has the APK). Leave unset for public builds.
       VITE_CARTO_KEY: ${{ secrets.TIMELINERX_CARTO_KEY_EMBED }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: android-app/package-lock.json
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
 
-      - uses: android-actions/setup-android@v3
+      # ubuntu-latest already ships the Android SDK (platform android-36, build-tools 35-37) with licences
+      # accepted, so no setup action is needed. We only make sure compileSdk 36 is present.
+      - name: Android SDK
+        shell: bash
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [[ ! -d "$ANDROID_HOME/platforms/android-36" ]]; then
+            yes | "$SDKM" --licenses > /dev/null || true
+            "$SDKM" "platforms;android-36" || echo "::warning::sdkmanager could not install android-36; Gradle will try"
+          fi
+          ls "$ANDROID_HOME/platforms"
 
       - name: Install
         run: npm ci
@@ -75,8 +86,10 @@ jobs:
         working-directory: android-app/android
         shell: bash
         run: |
+          sed -i 's/\r$//' gradlew          # a Windows checkout may have added CRLF line endings
           chmod +x gradlew
-          if [[ -n "${TLX_KEYSTORE:-}" ]]; then ./gradlew --no-daemon assembleRelease; else ./gradlew --no-daemon assembleDebug; fi
+          if [[ -n "${TLX_KEYSTORE:-}" ]]; then task=assembleRelease; else task=assembleDebug; fi
+          ./gradlew --no-daemon --stacktrace "$task"
 
       - name: Collect APK
         shell: bash
@@ -89,7 +102,7 @@ jobs:
           fi
           cd ../out && sha256sum *.apk > SHA256SUMS.txt && cat SHA256SUMS.txt
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: TimelinerX-android
           path: out/*
@@ -97,7 +110,7 @@ jobs:
 
       - name: Publish release (tags only)
         if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: out/*
           generate_release_notes: true

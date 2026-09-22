@@ -6,7 +6,7 @@ import { importTimeline } from '../src/engine/importer.js';
 import { buildJourney } from '../src/engine/journey.js';
 import { planFrames, recommendDuration, jerkReport } from '../src/engine/planner.js';
 
-const FIX = new URL('../../fixtures/', import.meta.url).pathname;
+const FIX = new URL('./fixtures/', import.meta.url).pathname;
 const REF = new URL('./ref/parity_ref.json', import.meta.url).pathname;
 const ref = existsSync(REF) ? JSON.parse(readFileSync(REF, 'utf8')) : {};
 

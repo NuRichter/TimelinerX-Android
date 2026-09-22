@@ -1,0 +1,10 @@
+# Keep Unix line endings for scripts that run on Linux CI, and binary data untouched.
+* text=auto
+android/gradlew text eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf
+*.jar binary
+*.png binary
+*.jpg binary
+*.ttf binary
+*.bin binary

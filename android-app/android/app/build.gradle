@@ -39,9 +39,6 @@ android {
             versionNameSuffix "-debug"
         }
     }
-    packagingOptions {
-        resources { excludes += ['META-INF/*.kotlin_module'] }
-    }
 }
 
 repositories {

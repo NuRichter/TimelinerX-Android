@@ -79,7 +79,7 @@ Timeline.json / .zip ─► streaming scanner ─► extractor ─► journey �
 
 ## Parity with the desktop engine
 
-`test/parity.test.js` imports all 24 desktop fixtures and compares against reference output produced by
+`test/parity.test.js` imports all 24 desktop fixtures (copied into `test/fixtures/`, so the Android app builds on its own) and compares against reference output produced by
 the Python engine (`scripts/parity_reference.py`): point counts, timestamps, coordinates, transport
 modes, trip legs, flight arcs, outliers and days are identical, and camera plans (4 zoom styles, 16:9
 and 9:16) match within 1e-6 of the viewport. `test/grading.test.js` checks all 11 theme graders against
